@@ -1,0 +1,45 @@
+{% extends 'auth.html' %}
+
+{% load static %}
+
+
+{% block form_title %}Login With Us{% endblock form_title %}
+
+{% block content %}
+
+<div class="card-content">
+    <div class="card-body">
+        <form class="form-horizontal form-simple" action="" method="post">
+            {% csrf_token %}
+            <div id="toast">
+                {% for message in messages %}
+                <div class="alert alert-info" role="alert"><strong></strong><i>{{ message }}</i></div>
+                {% endfor %}
+            </div>
+            <fieldset class="form-group position-relative has-icon-left mb-2">
+                <input type="text" class="form-control" name="username"
+                       placeholder="Your Username" required="">
+                <div class="form-control-position">
+                    <i class="la la-user"></i>
+                </div>
+            </fieldset>
+            <fieldset class="form-group position-relative has-icon-left">
+                <input type="password" class="form-control" name="password"
+                       placeholder="Enter Password" required="">
+                <div class="form-control-position">
+                    <i class="la la-key"></i>
+                </div>
+            </fieldset>
+            <div class="form-group row">
+                <div class="col-sm-12 col-12 text-right text-sm-right"><a
+                        href="{% url 'forgot_password' %}" class="text-primary">Forgot Password?</a>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+                Login
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

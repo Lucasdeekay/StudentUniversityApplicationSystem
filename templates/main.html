@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+{% load static %}
+<html class="loading" lang="en" data-textdirection="ltr">
+<!-- BEGIN: Head-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>Course Registration Portal</title>
+    <link rel="apple-touch-icon" href="{% static 'assets/images/logo.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/images/logo.png' %}">
+
+    <!-- BEGIN: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/vendors.min.css' %}">
+    <!-- END: Vendor CSS-->
+
+    <!-- BEGIN: Theme CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap-extended.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/components.min.css' %}">
+    <!-- END: Theme CSS-->
+
+    <!-- BEGIN: Page CSS-->
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu-modern.css' %}">
+    <!-- END: Page CSS-->
+
+    <!-- BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <!-- END: Custom CSS-->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css"
+          integrity="sha512-vebUliqxrVkBy3gucMhClmyQP9On/HAWQdKDXRaAlb/FKuTbxkjPKUyqVOxAcGwFDka79eTF+YXwfke1h3/wfg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+    <!--  jQuery cdn  -->
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+            integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+
+</head>
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+<body class="vertical-layout vertical-menu-modern 2-columns   fixed-navbar" data-open="click"
+      data-menu="vertical-menu-modern" data-col="2-columns">
+
+<!-- BEGIN: Header-->
+<nav class="header-navbar navbar-expand-md navbar navbar-with-menu navbar-without-dd-arrow fixed-top navbar-semi-light bg-primary navbar-shadow">
+    <div class="navbar-wrapper">
+        <div class="navbar-header">
+            <ul class="nav navbar-nav flex-row">
+                <li class="nav-item mobile-menu d-lg-none mr-auto"><a
+                        class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i
+                        class="la la-bars font-large-1"></i></a></li>
+                <li class="nav-item mr-auto"><a class="navbar-brand" href="index.html">
+                    <img class="brand-logo" alt="logo" src="{% static 'assets/images/logo.png' %}">
+                    <h3 class="brand-text">Registration</h3></a></li>
+                <li class="nav-item d-none d-lg-block nav-toggle"><a class="nav-link modern-nav-toggle pr-0"
+                                                                     data-toggle="collapse"><i
+                        class="la la-bars mr-3 font-medium-3 text-dark" data-ticon="ft-toggle-right"></i></a>
+                </li>
+                <li class="nav-item d-lg-none"><a class="nav-link open-navbar-container" data-toggle="collapse"
+                                                  data-target="#navbar-mobile"><i class="la la-ellipsis-v"></i></a></li>
+            </ul>
+        </div>
+        <div class="navbar-container content">
+            <div class="collapse navbar-collapse" id="navbar-mobile">
+                <ul class="nav navbar-nav mr-auto float-left">
+
+                </ul>
+                <ul class="nav navbar-nav float-right">
+
+                    <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link"
+                                                                   href="#" data-toggle="dropdown"><span
+                            class="mr-1 user-name text-bold-700">John Doe</span><span class="avatar avatar-online"><img
+                            src="{% static 'assets/images/avatar.png' %}" alt="avatar"><i></i></span></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'logout' %}"><i class="la la-user-cog"></i>
+                                Change Password</a>
+                            <a class="dropdown-item" href="{% url 'logout' %}"><i class="la la-power-off"></i>
+                                Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- END: Header-->
+
+
+<!-- BEGIN: Main Menu-->
+
+<div class="main-menu menu-fixed menu-light menu-accordion menu-shadow " data-scroll-to-active="true">
+    <div class="main-menu-content">
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+<!--            -->
+            <li class=" nav-item">
+                <a href="{% url 'change_password' %}">
+                    <i class="la la-user-cog"></i><span class="menu-title">Change Password</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- END: Main Menu-->
+<!-- BEGIN: Content-->
+<div class="app-content content">
+    <div class="content-overlay"></div>
+    <div class="content-wrapper">
+        <div class="content-header row">
+        </div>
+        <div class="content-body">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </div>
+</div>
+<!-- END: Content-->
+
+
+<!-- BEGIN: Footer-->
+<footer class="footer footer-static footer-light navbar-border navbar-shadow">
+    <p class="clearfix blue-grey lighten-2 text-sm-center mb-0 px-2"><span
+            class="float-md-left d-block d-md-inline-block">Copyright &copy; 2024</span><span
+            class="float-md-right d-none d-lg-block">Hand-crafted & Made with<i class="la la-heart pink"></i><span
+            id="scroll-top"></span></span></p>
+</footer>
+<!-- END: Footer-->
+
+
+<!-- BEGIN: Vendor JS-->
+<script src="{% static 'app-assets/vendors/js/vendors.min.js' %}"></script>
+<!-- BEGIN Vendor JS-->
+
+<!-- BEGIN: Page Vendor JS-->
+<script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.min.js' %}"></script>
+<!-- END: Page Vendor JS-->
+
+<!-- BEGIN: Theme JS-->
+<script src="{% static 'app-assets/js/core/app-menu.min.js' %}"></script>
+<script src="{% static 'app-assets/js/core/app.min.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/footer.min.js' %}"></script>
+<!-- END: Theme JS-->
+
+<script src="{% static 'assets/js/custom.js' %}"></script>
+
+</body>
+<!-- END: Body-->
+</html>
