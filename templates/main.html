@@ -73,7 +73,7 @@
 
                     <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link"
                                                                    href="#" data-toggle="dropdown"><span
-                            class="mr-1 user-name text-bold-700">John Doe</span><span class="avatar avatar-online"><img
+                            class="mr-1 user-name text-bold-700">{{ user.first_name }} {{ user.last_name }}</span><span class="avatar avatar-online"><img
                             src="{% static 'assets/images/avatar.png' %}" alt="avatar"><i></i></span></a>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="{% url 'logout' %}"><i class="la la-power-off"></i>
