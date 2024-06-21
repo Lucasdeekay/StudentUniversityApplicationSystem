@@ -37,7 +37,6 @@ class ParentLetterOfUndertaking(models.Model):
         ('PARENT', 'Parent'),
         ('GUARDIAN', 'Guardian'),
     ])
-    name = models.CharField(max_length=255)
     file = models.FileField(upload_to='letters_of_undertaking/')
 
 
@@ -48,7 +47,6 @@ class GuarantorLetterOfUndertaking(models.Model):
         ('CLERIC', 'Cleric'),  # Corrected typo (optional)
         ('PUBLIC_SERVANT', 'Public Servant'),
     ])
-    name = models.CharField(max_length=255)
     file = models.FileField(upload_to='letters_of_undertaking/')
 
 
@@ -90,10 +88,19 @@ class StudentRegistration(models.Model):
     local_government_certification = models.ForeignKey(LocalGovernmentCertification, on_delete=models.CASCADE,
                                                        null=True, blank=True)
     bio_data = models.ForeignKey(StudentBioData, on_delete=models.CASCADE, null=True, blank=True)
-    registration_status = models.CharField(max_length=20, choices=[
+    registration_status = models.CharField(max_length=100, choices=[
         ('PENDING_PAYMENT', 'Pending Payment'),
-        ('DOCUMENTS_PENDING', 'Documents Pending'),
-        ('BIO_PENDING', 'Bio-data Pending'),
+        ('JAMB_ADMISSION_LETTER_RE_UPLOAD', 'Re-upload JAMB Admission Letter'),
+        ('SCHOOL_ADMISSION_LETTER_RE_UPLOAD', 'Re-upload School Admission Letter'),
+        ('JAMB_RESULT_SLIP_RE_UPLOAD', 'Re-upload JAMB Result Slip'),
+        ('O_LEVEL_RESULT_RE_UPLOAD', 'Re-upload O\'Level Result'),
+        ('MEDICAL_EXAMINATION_FORM_RE_UPLOAD', 'Re-upload Medical Examination Form'),
+        ('PARENT_LETTER_OF_UNDERTAKING_RE_UPLOAD', 'Re-upload Parent Letter Of Undertaking'),
+        ('GUARANTOR_LETTER_OF_UNDERTAKING_RE_UPLOAD', 'Re-upload Guarantor Letter Of Undertaking'),
+        ('BIRTH_CERTIFICATE_RE_UPLOAD', 'Re-upload Birth Certificate'),
+        ('LOCAL_GOVERNMENT_CERTIFICATE_RE_UPLOAD', 'Re-upload Local Government Certification'),
+        ('BIO_DATA_RE_UPLOAD', 'Re-upload Bio-data'),
+        ('ALL_DOCUMENTS_RE_UPLOAD', 'Re-upload All Documents'),
         ('COMPLETED', 'Completed'),
     ], default='PENDING_PAYMENT')
 

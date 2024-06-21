@@ -1,0 +1,107 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<section class="users-edit">
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <ul class="nav nav-tabs mb-2" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center active" id="account-tab" data-toggle="tab"
+                           href="#account" aria-controls="account" role="tab" aria-selected="true">
+                            <i class="la la-user mr-25"></i><span class="d-none d-sm-block">Update Registration</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="account" aria-labelledby="account-tab" role="tabpanel">
+
+                        <!-- users edit account form start -->
+                        <form method="post" action="" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <div class="controls">
+                                            <label>Upload File</label>
+                                            <select name="file_type" class="form-control mb-1">
+                                                <option value="">--- Select File Type ---</option>
+                                                <option value="school_admission_letter">Dominion University Admission Letter</option>
+                                                <option value="jamb_admission_letter">JAMB Admission Letter</option>
+                                                <option value="jamb_result_slip">JAMB Result Slip</option>
+                                                <option value="medical_examination_form">Medical Examination Form</option>
+                                                <option value="local_government_certification">Local Government Certification</option>
+                                                <option value="birth_certificate">Birth Certificate</option>
+                                                <option value="bio_data">Student Bio Data</option>
+                                            </select>
+                                            <input type="file" class="form-control" name="file"
+                                                   placeholder="Upload File"
+                                                   data-validation-required-message="This field is required">
+                                            <div class="help-block"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="controls">
+                                            <label>O'Level Result</label>
+                                            <select name="o_level_type" class="form-control mb-1">
+                                                <option value="">--- Select Result Type ---</option>
+                                                <option value="WAEC">WAEC</option>
+                                                <option value="NECO">NECO</option>
+                                            </select>
+                                            <input type="file" class="form-control" name="o_level_result"
+                                                   placeholder="O'Level Result"
+                                                   data-validation-required-message="This field is required">
+                                            <div class="help-block"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <div class="controls">
+                                            <label>Parent Letter Of Undertaking</label>
+                                            <select name="parent_relationship" class="form-control mb-1">
+                                                <option value="">--- Select Parent Relationship ---</option>
+                                                <option value="PARENT">PARENT</option>
+                                                <option value="GUARDIAN">GUARDIAN</option>
+                                            </select>
+                                            <input type="file" class="form-control" name="parent_letter_of_undertaking"
+                                                   placeholder="Parent Letter Of Undertaking"
+                                                   data-validation-required-message="This field is required">
+                                            <div class="help-block"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="controls">
+                                            <label>Guarantor Letter Of Undertaking</label>
+                                            <select name="guarantor_relationship" class="form-control mb-1">
+                                                <option value="">--- Select Guarantor Relationship ---</option>
+                                                <option value="CLERGY">CLERGY</option>
+                                                <option value="CLERIC">CLERIC</option>
+                                                <option value="PUBLIC_SERVANT">PUBLIC SERVANT</option>
+                                            </select>
+                                            <input type="file" class="form-control" name="guarantor_letter_of_undertaking"
+                                                   placeholder="Guarantor Letter Of Undertaking"
+                                                   data-validation-required-message="This field is required">
+                                            <div class="help-block"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex flex-sm-row flex-column justify-content-end mt-1">
+                                    <button type="submit" class="btn btn-lg btn-primary glow mb-1 mb-sm-0 mr-0 mr-sm-1">
+                                        Update Resgistration
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- users edit account form ends -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

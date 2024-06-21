@@ -26,13 +26,15 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            _, created = AcceptanceFeePayment.objects.get_or_create(user=user)
+
             # Redirect to successful login page
             return redirect('user_dashboard')  # Replace 'home' with your desired redirect URL
         else:
             # Invalid login credentials
             messages.error(request, 'Invalid username or password.')
             return redirect('login')
-    return render(request, 'change_password.html')
+    return render(request, 'login.html')
 
 
 def forgot_password_view(request):
@@ -76,12 +78,11 @@ def logout_view(request):
 
 @login_required
 def change_password_view(request):
+    user = request.user
     if request.method == 'POST':
         old_password = request.POST.get('old_password')
         new_password1 = request.POST.get('new_password1')
         new_password2 = request.POST.get('new_password2')
-
-        user = request.user
 
         # Check if the old password is correct
         if not user.check_password(old_password):
@@ -103,7 +104,7 @@ def change_password_view(request):
         messages.success(request, 'Your password was successfully updated!')
         return redirect('change_password')
 
-    return render(request, 'change_password.html')
+    return render(request, 'change_password.html', {'user': user})
 
 
 def verify_payment(request, reference):
@@ -114,10 +115,10 @@ def verify_payment(request, reference):
         acceptance.status = True
         acceptance.save()
         messages.success(request, f"Acceptance fee successfully paid.")
-        return redirect('user_dashboard')
+        return redirect('acceptance_fee')
     else:
         messages.error(request, 'Payment verification failed')
-        return redirect('user_dashboard')
+        return redirect('acceptance_fee')
 
 
 @login_required
@@ -134,38 +135,43 @@ def payment(request):
     if response['status']:
         return HttpResponseRedirect(response['data']['authorization_url'])
 
-    return render(request, 'deposit.html')
 
 @login_required
 def student_registration(request):
-    if request.method == 'POST':
-        # Check if user has paid acceptance fee
-        user = request.user
-        payment_made = AcceptanceFeePayment.objects.get(user=user)
-        if not payment_made.status:
-            return redirect('payment')  # Replace 'payment_page' with your actual payment page URL
+    # Check if user has paid acceptance fee
+    user = request.user
+    payment_made, created = AcceptanceFeePayment.objects.get_or_create(user=user)
 
-        # Process registration details (excluding bio-data)
+    if not payment_made.status:
+        messages.info(request, "Kindly pay the acceptance fee to proceed with registration")
+        return redirect('acceptance_fee')
+
+    if StudentRegistration.objects.filter(user=user).exists():
+        messages.info(request, "Kindly update your registration instead")
+        return redirect('student_registration_update')
+
+    if request.method == 'POST':
+
         jamb_letter = request.FILES.get('jamb_admission_letter')
         school_letter = request.FILES.get('school_admission_letter')
         jamb_slip = request.FILES.get('jamb_result_slip')
         o_level_result = request.FILES.get('o_level_result')
-        o_level_type = request.FILES.get('o_level_type').strip()
+        o_level_type = request.POST.get('o_level_type').strip()
         medical_form = request.FILES.get('medical_examination_form')
         parent_letter = request.FILES.get('parent_letter_of_undertaking')
-        parent_name = request.POST.get('parent_name').strip()
         parent_relationship = request.POST.get('parent_relationship').strip()
         guarantor_letter = request.FILES.get('guarantor_letter_of_undertaking')
-        guarantor_name = request.POST.get('guarantor_name').strip()
         guarantor_relationship = request.POST.get('guarantor_relationship').strip()
         birth_certificate = request.FILES.get('birth_certificate')
         local_government_cert = request.FILES.get('local_government_certification')
         bio_data = request.FILES.get('bio_data')
 
         # Check if all required documents are uploaded
-        if not all([jamb_letter, school_letter, jamb_slip, o_level_result, medical_form, parent_letter, guarantor_letter, birth_certificate, local_government_cert, bio_data]):
-            message = 'Please upload all required documents.'
-            return render(request, 'registration_form.html', {'message': message})
+        if not all(
+                [jamb_letter, school_letter, jamb_slip, o_level_result, medical_form, parent_letter, guarantor_letter,
+                 birth_certificate, local_government_cert, bio_data]):
+            messages.error(request, 'Please upload all required documents.')
+            return redirect('process_registration')
 
         # Save registration details (excluding bio-data)
         registration, created = StudentRegistration.objects.get_or_create(user=user)
@@ -176,29 +182,41 @@ def student_registration(request):
         registration.jamb_result_slip = JAMBResultSlip.objects.create(user=user, file=jamb_slip)
         registration.o_level_result = OLevelResult.objects.create(user=user, type=o_level_type, file=o_level_result)
         registration.medical_examination_form = MedicalExaminationForm.objects.create(user=user, file=medical_form)
-        registration.letter_of_undertaking_parent = ParentLetterOfUndertaking.objects.create(user=user, name=parent_name, relationship=parent_relationship, file=parent_letter)
-        registration.letter_of_undertaking_guarantor = GuarantorLetterOfUndertaking.objects.create(user=user, name=guarantor_name, relationship=guarantor_relationship, file=guarantor_letter)
+        registration.letter_of_undertaking_parent = ParentLetterOfUndertaking.objects.create(user=user,
+                                                                                             relationship=parent_relationship,
+                                                                                             file=parent_letter)
+        registration.letter_of_undertaking_guarantor = GuarantorLetterOfUndertaking.objects.create(user=user,
+                                                                                                   relationship=guarantor_relationship,
+                                                                                                   file=guarantor_letter)
         registration.birth_certificate = BirthCertificate.objects.create(user=user, file=birth_certificate)
-        registration.local_government_certification = LocalGovernmentCertification.objects.create(user=user, file=local_government_cert)
+        registration.local_government_certification = LocalGovernmentCertification.objects.create(user=user,
+                                                                                                  file=local_government_cert)
         registration.bio_data = StudentBioData.objects.create(user=user, file=bio_data)
         registration.save()
 
-        message = 'Registration successful!'
-        return render(request, 'registration_form.html', {'message': message})
+        messages.success(request, 'Registration successful!')
+        return redirect('process_registration')
 
     else:
         # Display registration form
-        return render(request, 'registration_form.html')
+        return render(request, 'process_registration.html', {'user': user, "payment_status": payment_made.status})
 
 
 @login_required
 def student_registration_update(request):
+    # Check if user has paid acceptance fee
+    user = request.user
+    payment_made, created = AcceptanceFeePayment.objects.get_or_create(user=user)
+
+    if not payment_made.status:
+        messages.info(request, "Kindly pay the acceptance fee to proceed with registration")
+        return redirect('acceptance_fee')
+
+    if not StudentRegistration.objects.filter(user=user).exists():
+        messages.info(request, "Kindly proceed with your registration first")
+        return redirect('student_registration')
+
     if request.method == 'POST':
-        # Check if user has paid acceptance fee
-        user = request.user
-        payment_made = AcceptanceFeePayment.objects.filter(user=user, status=True).exists()
-        if not payment_made:
-            return redirect('payment_page')  # Replace 'payment_page' with your actual payment page URL
 
         # Get existing registration object
         registration = StudentRegistration.objects.get(user=user)
@@ -206,24 +224,26 @@ def student_registration_update(request):
         # Process registration details (excluding bio-data)
         update_data = {}  # Dictionary to store data for update
 
+        file_type = request.POST.get('file_type')
+
         # Update JAMB Admission Letter
-        if request.FILES.get('jamb_admission_letter'):
+        if file_type == 'jamb_admission_letter':
             jamb_letter_instance, created = JAMBAdmissionLetter.objects.get_or_create(user=user)
-            jamb_letter_instance.file = request.FILES.get('jamb_admission_letter')
+            jamb_letter_instance.file = request.FILES.get('file')
             jamb_letter_instance.save()
             update_data['jamb_admission_letter'] = jamb_letter_instance
 
         # Update School Admission Letter
-        if request.FILES.get('school_admission_letter'):
+        if file_type == 'school_admission_letter':
             school_letter_instance, created = SchoolAdmissionLetter.objects.get_or_create(user=user)
-            school_letter_instance.file = request.FILES.get('school_admission_letter')
+            school_letter_instance.file = request.FILES.get('file')
             school_letter_instance.save()
             update_data['school_admission_letter'] = school_letter_instance
 
         # Update JAMB Result Slip
-        if request.FILES.get('jamb_result_slip'):
+        if file_type == 'jamb_result_slip':
             jamb_slip_instance, created = JAMBResultSlip.objects.get_or_create(user=user)
-            jamb_slip_instance.file = request.FILES.get('jamb_result_slip')
+            jamb_slip_instance.file = request.FILES.get('file')
             jamb_slip_instance.save()
             update_data['jamb_result_slip'] = jamb_slip_instance
 
@@ -237,58 +257,60 @@ def student_registration_update(request):
                 o_level_instance.save()
                 update_data['o_level_result'] = o_level_instance
             else:
-                message = 'O\'Level Result requires a type (WAEC or NECO).'
-                return render(request, 'registration_form.html', {'message': message})
+                messages.success(request, 'O\'Level Result requires a type (WAEC or NECO).')
+                return redirect('student_registration_update')
 
         # Update Medical Examination Form
-        if request.FILES.get('medical_examination_form'):
+        if file_type == 'medical_examination_form':
             medical_form_instance, created = MedicalExaminationForm.objects.get_or_create(user=user)
-            medical_form_instance.file = request.FILES.get('medical_examination_form')
+            medical_form_instance.file = request.FILES.get('file')
             medical_form_instance.save()
             update_data['medical_examination_form'] = medical_form_instance
 
         # Update Parent Details
-        parent_update = {}
-        if request.FILES.get('parent_letter_of_undertaking'):
-            parent_update['file'] = request.FILES.get('parent_letter_of_undertaking')
-        if request.POST.get('parent_name'):
-            parent_update['name'] = request.POST.get('parent_name').strip()
         if request.POST.get('parent_relationship'):
-            parent_update['relationship'] = request.POST.get('parent_relationship').strip()
-
-        if parent_update:
-            registration.letter_of_undertaking_parent.update(**parent_update)
+            parent_relationship = request.POST.get('parent_relationship').strip()
+            if parent_relationship:
+                parent_letter_instance, created = ParentLetterOfUndertaking.objects.get_or_create(user=user)
+                parent_letter_instance.relationship = parent_relationship
+                parent_letter_instance.file = request.FILES.get('parent_letter_of_undertaking')
+                parent_letter_instance.save()
+                update_data['letter_of_undertaking_parent'] = parent_letter_instance
+            else:
+                messages.success(request, 'Parent Letter of Undertaking requires a type.')
+                return redirect('student_registration_update')
 
         # Update Guarantor Details
-        guarantor_update = {}
-        if request.FILES.get('guarantor_letter_of_undertaking'):
-            guarantor_update['file'] = request.FILES.get('guarantor_letter_of_undertaking')
-        if request.POST.get('guarantor_name'):
-            guarantor_update['name'] = request.POST.get('guarantor_name').strip()
         if request.POST.get('guarantor_relationship'):
-            guarantor_update['relationship'] = request.POST.get('guarantor_relationship').strip()
-
-        if guarantor_update:
-            registration.letter_of_undertaking_guarantor.update(**guarantor_update)
+            guarantor_relationship = request.POST.get('guarantor_relationship').strip()
+            if guarantor_relationship:
+                guarantor_letter_instance, created = GuarantorLetterOfUndertaking.objects.get_or_create(user=user)
+                guarantor_letter_instance.relationship = guarantor_relationship
+                guarantor_letter_instance.file = request.FILES.get('guarantor_letter_of_undertaking')
+                guarantor_letter_instance.save()
+                update_data['letter_of_undertaking_parent'] = guarantor_letter_instance
+            else:
+                messages.success(request, 'Guarantor Letter of Undertaking requires a type.')
+                return redirect('student_registration_update')
 
         # Update Birth Certificate
-        if request.FILES.get('birth_certificate'):
+        if file_type == 'birth_certificate':
             birth_certificate_instance, created = BirthCertificate.objects.get_or_create(user=user)
-            birth_certificate_instance.file = request.FILES.get('birth_certificate')
+            birth_certificate_instance.file = request.FILES.get('file')
             birth_certificate_instance.save()
             update_data['birth_certificate'] = birth_certificate_instance
 
         # Update Local Government Certification
-        if request.FILES.get('local_government_certification'):
+        if file_type == 'local_government_certification':
             local_government_cert_instance, created = LocalGovernmentCertification.objects.get_or_create(user=user)
-            local_government_cert_instance.file = request.FILES.get('local_government_certification')
+            local_government_cert_instance.file = request.FILES.get('file')
             local_government_cert_instance.save()
             update_data['local_government_certification'] = local_government_cert_instance
 
         # Update Student Bio Data
-        if request.FILES.get('bio_data'):
+        if file_type == 'bio_data':
             bio_data, created = StudentBioData.objects.get_or_create(user=user)
-            bio_data.file = request.FILES.get('bio_data')
+            bio_data.file = request.FILES.get('file')
             bio_data.save()
             update_data['bio_data'] = bio_data
 
@@ -296,28 +318,30 @@ def student_registration_update(request):
         if update_data:
             registration.update(**update_data)
 
-            message = 'Registration details updated successfully!'
-            return render(request, 'registration_form.html', {'message': message})
+            messages.success(request, 'Registration details updated successfully!')
+            return redirect('student_registration_update')
 
         else:
             # Display registration form
-            return render(request, 'registration_form.html')
+            return redirect('student_registration_update')
 
     else:
         # Display registration form
-        return render(request, 'registration_form.html')
+        return render(request, 'update_registration.html', {'user': user, "payment_status": payment_made.status})
 
 
 @login_required
 def user_profile(request):
+    # Check if user has paid acceptance fee
     user = request.user
-
+    payment_made, created = AcceptanceFeePayment.objects.get_or_create(user=user)
     # Check registration status
-    registration = StudentRegistration.objects.filter(user=user).first()
+    registration, created = StudentRegistration.objects.get_or_create(user=user)
 
     context = {
         'user': user,
         'registration_status': registration.status,
+        "payment_status": payment_made.status
     }
 
     return render(request, 'user_profile.html', context)
@@ -328,11 +352,11 @@ def download_acceptance_fee_slip(request):
     user = request.user
 
     # Check if user has paid acceptance fee
-    acceptance_fee = AcceptanceFeePayment.objects.filter(user=user, status=True).first()
+    fee = AcceptanceFeePayment.objects.get(user=user, status=True)
 
     # Get user details and payment information
-    amount_paid = acceptance_fee.amount
-    payment_date = acceptance_fee.payment_date.strftime('%d %B, %Y')  # Format date
+    amount_paid = fee.amount
+    payment_date = fee.payment_date.strftime('%d %B, %Y')  # Format date
 
     # Set up PDF generation
     response = HttpResponse(content_type='application/pdf')
@@ -341,7 +365,7 @@ def download_acceptance_fee_slip(request):
 
     # Institution details (replace with your information)
     institution_name = "Dominion University"
-    logo_path = "path/to/your/institution_logo.jpg"  # Replace with actual path
+    logo_path = "static/assets/images/logo.png"  # Replace with actual path
 
     # Add institution logo
     if logo_path:
@@ -392,7 +416,7 @@ def download_registration_clearance_fee_slip(request):
 
     # Institution details (replace with your information)
     institution_name = "Dominion University"
-    logo_path = "path/to/your/institution_logo.jpg"  # Replace with actual path
+    logo_path = "static/assets/images/logo.png"  # Replace with actual path
 
     # Add institution logo
     if logo_path:
@@ -452,5 +476,3 @@ def get_document_status(document_instance):
         return "Submitted"
     else:
         return "Missing"
-
-

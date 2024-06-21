@@ -33,12 +33,12 @@ class MedicalExaminationFormAdmin(admin.ModelAdmin):
 
 @admin.register(ParentLetterOfUndertaking)
 class ParentLetterOfUndertakingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'relationship', 'name', 'file')
+    list_display = ('user', 'relationship', 'file')
 
 
 @admin.register(GuarantorLetterOfUndertaking)
 class GuarantorLetterOfUndertakingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'relationship', 'name', 'file')
+    list_display = ('user', 'relationship', 'file')
 
 
 @admin.register(BirthCertificate)

@@ -76,8 +76,6 @@
                             class="mr-1 user-name text-bold-700">John Doe</span><span class="avatar avatar-online"><img
                             src="{% static 'assets/images/avatar.png' %}" alt="avatar"><i></i></span></a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{% url 'logout' %}"><i class="la la-user-cog"></i>
-                                Change Password</a>
                             <a class="dropdown-item" href="{% url 'logout' %}"><i class="la la-power-off"></i>
                                 Logout</a>
                         </div>
@@ -96,6 +94,23 @@
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 <!--            -->
+            <li class=" nav-item">
+                <a href="{% url 'user_dashboard' %}">
+                    <i class="la la-home"></i><span class="menu-title">Dashboard</span>
+                </a>
+            </li>
+            {% if payment_status %}
+            <li class=" nav-item">
+                <a href="{% url 'student_registration' %}">
+                    <i class="la la-list"></i><span class="menu-title">Process Registration</span>
+                </a>
+            </li>
+            <li class=" nav-item">
+                <a href="{% url 'student_registration_update' %}">
+                    <i class="la la-edit"></i><span class="menu-title">Update Registration</span>
+                </a>
+            </li>
+            {% endif %}
             <li class=" nav-item">
                 <a href="{% url 'change_password' %}">
                     <i class="la la-user-cog"></i><span class="menu-title">Change Password</span>

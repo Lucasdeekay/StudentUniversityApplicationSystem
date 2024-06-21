@@ -1,0 +1,83 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<section id="faq-search">
+    <div class="row">
+        <div class="col-12">
+
+            {% if not payment_status %}
+            <div class="card bg-primary white">
+                <div class="card-content text-center">
+                    <div class="card-header bg-dark text-left">
+                        <h2 class="mt-2 text-white">
+                            Welcome Remark!!
+                        </h2>
+                    </div>
+                    <div class="card-body text-white">
+                        <h4 class="card-text my-3 mx-4">
+                            This is to officially congratulate you on your successful admission into our prestigious
+                            institution,<br> <strong>DOMINION UNIVERSITY, IBADAN.</strong>
+                        </h4>
+
+                        <h4 class="card-text my-3 mx-4">
+                            To begin your official registration process,<br> kindly proceed to make <strong>acceptance
+                            fee
+                            payment</strong> by clicking the button below!
+                        </h4>
+                        <a href="{% url 'payment' %}" class="btn btn-lg btn-dark white my-2">Pay Acceptance Fee
+                            (#30,000)</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card bg-white white">
+                <div class="card-content">
+                    <div class="card-header bg-dark">
+                        <h2 class="mt-2 text-white">
+                            Profile Status
+                        </h2>
+                    </div>
+                    <div class="card-body text-center">
+                        <h4 class="card-text my-3 mx-4 text-left">
+                            First Name: <strong>John</strong>
+                        </h4>
+                        <h4 class="card-text my-3 mx-4 text-left">
+                            Last Name: <strong>Doe</strong>
+                        </h4>
+                        <h4 class="card-text my-3 mx-4 text-left">
+                            Registration Status: <strong>Acceptance Fee Pending</strong>
+                        </h4>
+
+                        <h2 class="mt-2 text-left border-top pt-2">
+                            Registration Process
+                        </h2>
+                        <div class="card-text my-2 mx-1 text-left bold">
+                            Follow the steps highlighted below to process your registration
+                            <ul class="list">
+                                <li>Download the forms below</li>
+                                <li>Fill the forms</li>
+                                <li>Begin registration process. This involves uploading the filled forms amongst other
+                                    necessary requirements
+                                </li>
+                                <li>Check Registration status regularly and update registration, if need be.</li>
+                                <li>If registration has been completed, download the registration slip</li>
+                            </ul>
+                        </div>
+                        <a href="{% static 'assets/documents/Dominion_University_Student_bio-data_form.pdf' %}" download
+                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i> Student Bio-Data</a>
+                        <a href="{% static 'assets/documents/Letter_of_Undertaking(Parent_Guardian_or_Sponsor).pdf' %}" download
+                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i> Parent Letter of Undertaking</a>
+                        <a href="{% static 'assets/documents/LETTER_OF_UNDERTAKING_(CLERGY_CLERIC_OR_PUBLIC_SERVANT).pdf' %}" download
+                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i>Clergy Letter of Undertaking</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

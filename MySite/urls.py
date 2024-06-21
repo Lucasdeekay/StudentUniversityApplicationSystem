@@ -28,6 +28,11 @@ urlpatterns = [
     path('reset-password/<int:user_id>', views.password_reset_view, name='password_reset'),
     path('logout/', views.logout_view, name='logout'),
     path('payment/', views.payment, name='payment'),
+    path('dashboard/', views.user_profile, name='user_dashboard'),
     path('verify/<str:reference>/', views.verify_payment, name='verify_payment'),
+    path('process-registration/', views.student_registration, name='student_registration'),
+    path('update-registration/', views.student_registration_update, name='student_registration_update'),
+    path('download-acceptance-fee-slip/', views.download_acceptance_fee_slip, name='download_acceptance_fee_slip'),
+    path('download-registration-clearance-fee-slip/', views.download_registration_clearance_fee_slip, name='download_registration_clearance_fee_slip'),
     path('api/', include(router.urls)),
 ]
