@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    JAMBAdmissionLetter, SchoolAdmissionLetter, JAMBResultSlip, OLevelResult,
+    JAMBAdmissionLetter, SchoolAcceptanceForm, JAMBResultSlip, OLevelResult,
     MedicalExaminationForm, ParentLetterOfUndertaking, GuarantorLetterOfUndertaking,
     BirthCertificate, LocalGovernmentCertification, StudentBioData, StudentRegistration, AcceptanceFeePayment
 )
@@ -21,11 +21,11 @@ class JAMBAdmissionLetterSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SchoolAdmissionLetterSerializer(serializers.ModelSerializer):
+class SchoolAcceptanceFormSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 
     class Meta:
-        model = SchoolAdmissionLetter
+        model = SchoolAcceptanceForm
         fields = '__all__'
 
 
@@ -104,7 +104,7 @@ class StudentBioDataSerializer(serializers.ModelSerializer):
 class StudentRegistrationSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     jamb_admission_letter = JAMBAdmissionLetterSerializer(read_only=True)
-    school_admission_letter = SchoolAdmissionLetterSerializer(read_only=True)
+    school_acceptance_form = SchoolAcceptanceFormSerializer(read_only=True)
     jamb_result_slip = JAMBResultSlipSerializer(read_only=True)
     o_level_result = OLevelResultSerializer(read_only=True)
     medical_examination_form = MedicalExaminationFormSerializer(read_only=True)

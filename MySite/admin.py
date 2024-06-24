@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    JAMBAdmissionLetter, SchoolAdmissionLetter, JAMBResultSlip, OLevelResult,
+    JAMBAdmissionLetter, SchoolAcceptanceForm, JAMBResultSlip, OLevelResult,
     MedicalExaminationForm, ParentLetterOfUndertaking, GuarantorLetterOfUndertaking,
     BirthCertificate, LocalGovernmentCertification, StudentBioData, StudentRegistration, AcceptanceFeePayment
 )
@@ -11,8 +11,8 @@ class JAMBAdmissionLetterAdmin(admin.ModelAdmin):
     list_display = ('user', 'file')
 
 
-@admin.register(SchoolAdmissionLetter)
-class SchoolAdmissionLetterAdmin(admin.ModelAdmin):
+@admin.register(SchoolAcceptanceForm)
+class SchoolAcceptanceFormAdmin(admin.ModelAdmin):
     list_display = ('user', 'file')
 
 

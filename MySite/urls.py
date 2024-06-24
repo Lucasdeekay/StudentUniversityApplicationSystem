@@ -2,14 +2,14 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from . import views
-from .viewsets import JAMBAdmissionLetterViewSet, SchoolAdmissionLetterViewSet, JAMBResultSlipViewSet, \
+from .viewsets import JAMBAdmissionLetterViewSet, SchoolAcceptanceFormViewSet, JAMBResultSlipViewSet, \
     OLevelResultViewSet, MedicalExaminationFormViewSet, ParentLetterOfUndertakingViewSet, \
     GuarantorLetterOfUndertakingViewSet, BirthCertificateViewSet, LocalGovernmentCertificationViewSet, \
     StudentBioDataViewSet, StudentRegistrationViewSet, AcceptanceFeePaymentViewSet
 
 router = DefaultRouter()
 router.register(r'admission-letters', JAMBAdmissionLetterViewSet)
-router.register(r'school-admission-letters', SchoolAdmissionLetterViewSet)
+router.register(r'school-acceptance-letters', SchoolAcceptanceFormViewSet)
 router.register(r'jamb-result-slips', JAMBResultSlipViewSet)
 router.register(r'o-level-results', OLevelResultViewSet)
 router.register(r'medical-examination-forms', MedicalExaminationFormViewSet)

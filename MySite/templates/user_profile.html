@@ -43,13 +43,13 @@
                     </div>
                     <div class="card-body text-center">
                         <h4 class="card-text my-3 mx-4 text-left">
-                            First Name: <strong>John</strong>
+                            First Name: <strong>{{ user.first_name }}</strong>
                         </h4>
                         <h4 class="card-text my-3 mx-4 text-left">
-                            Last Name: <strong>Doe</strong>
+                            Last Name: <strong>{{ user.last_name }}</strong>
                         </h4>
                         <h4 class="card-text my-3 mx-4 text-left">
-                            Registration Status: <strong>Acceptance Fee Pending</strong>
+                            Registration Status: <strong>{{ registration_status }}</strong>
                         </h4>
 
                         <h2 class="mt-2 text-left border-top pt-2">
@@ -73,6 +73,8 @@
                            class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i> Parent Letter of Undertaking</a>
                         <a href="{% static 'assets/documents/LETTER_OF_UNDERTAKING_(CLERGY_CLERIC_OR_PUBLIC_SERVANT).pdf' %}" download
                            class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i>Clergy Letter of Undertaking</a>
+                        <a href="{% static 'assets/documents/ACCEPTANCE_OF_OFFER_FORM_DOMINION_UNIVERSITY.pdf' %}" download
+                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i>Acceptance of Offer Letter</a>
                     </div>
                 </div>
             </div>

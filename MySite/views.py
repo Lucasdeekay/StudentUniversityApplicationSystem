@@ -12,9 +12,10 @@ from paystackapi import transaction
 from reportlab.pdfgen import canvas
 
 from .models import (
-    JAMBAdmissionLetter, SchoolAdmissionLetter, JAMBResultSlip, OLevelResult,
+    JAMBAdmissionLetter, JAMBResultSlip, OLevelResult,
     MedicalExaminationForm, ParentLetterOfUndertaking, GuarantorLetterOfUndertaking,
-    BirthCertificate, LocalGovernmentCertification, StudentRegistration, AcceptanceFeePayment, StudentBioData
+    BirthCertificate, LocalGovernmentCertification, StudentRegistration, AcceptanceFeePayment, StudentBioData,
+    SchoolAcceptanceForm
 )
 
 
@@ -109,10 +110,6 @@ def verify_payment(request, reference):
     response = transaction.Transaction.verify(reference)
 
     if response['status'] and response['data']['status'] == 'success':
-        acceptance = AcceptanceFeePayment(user=request.user)
-        acceptance.status = True
-        acceptance.save()
-        messages.success(request, f"Acceptance fee successfully paid.")
         return redirect('acceptance_fee')
     else:
         messages.error(request, 'Payment verification failed')
@@ -131,6 +128,15 @@ def payment(request):
     )
 
     if response['status']:
+        fee.status = True
+        fee.save()
+
+        student_registration = get_object_or_404(StudentRegistration, user=request.user)
+        student_registration.acceptance_fee = fee
+        student_registration.registration_status = 'Upload All Documents'
+        student_registration.save()
+
+        messages.success(request, f"Acceptance fee successfully paid.")
         return HttpResponseRedirect(response['data']['authorization_url'])
 
 
@@ -144,14 +150,10 @@ def student_registration(request):
         messages.info(request, "Kindly pay the acceptance fee to proceed with registration")
         return redirect('acceptance_fee')
 
-    if StudentRegistration.objects.filter(user=user).exists():
-        messages.info(request, "Kindly update your registration instead")
-        return redirect('student_registration_update')
-
     if request.method == 'POST':
 
         jamb_letter = request.FILES.get('jamb_admission_letter')
-        school_letter = request.FILES.get('school_admission_letter')
+        school_acceptance_form = request.FILES.get('school_acceptance_form')
         jamb_slip = request.FILES.get('jamb_result_slip')
         o_level_result = request.FILES.get('o_level_result')
         o_level_type = request.POST.get('o_level_type').strip()
@@ -166,7 +168,7 @@ def student_registration(request):
 
         # Check if all required documents are uploaded
         if not all(
-                [jamb_letter, school_letter, jamb_slip, o_level_result, medical_form, parent_letter, guarantor_letter,
+                [jamb_letter, school_acceptance_form, jamb_slip, o_level_result, medical_form, parent_letter, guarantor_letter,
                  birth_certificate, local_government_cert, bio_data]):
             messages.error(request, 'Please upload all required documents.')
             return redirect('process_registration')
@@ -176,7 +178,7 @@ def student_registration(request):
         if created:
             registration.acceptance_fee = AcceptanceFeePayment.objects.get(user=user)
         registration.jamb_admission_letter = JAMBAdmissionLetter.objects.create(user=user, file=jamb_letter)
-        registration.school_admission_letter = SchoolAdmissionLetter.objects.create(user=user, file=school_letter)
+        registration.school_admission_letter = SchoolAcceptanceForm.objects.create(user=user, file=school_acceptance_form)
         registration.jamb_result_slip = JAMBResultSlip.objects.create(user=user, file=jamb_slip)
         registration.o_level_result = OLevelResult.objects.create(user=user, type=o_level_type, file=o_level_result)
         registration.medical_examination_form = MedicalExaminationForm.objects.create(user=user, file=medical_form)
@@ -210,10 +212,6 @@ def student_registration_update(request):
         messages.info(request, "Kindly pay the acceptance fee to proceed with registration")
         return redirect('acceptance_fee')
 
-    if not StudentRegistration.objects.filter(user=user).exists():
-        messages.info(request, "Kindly proceed with your registration first")
-        return redirect('student_registration')
-
     if request.method == 'POST':
 
         # Get existing registration object
@@ -222,95 +220,98 @@ def student_registration_update(request):
         # Process registration details (excluding bio-data)
         update_data = {}  # Dictionary to store data for update
 
-        file_type = request.POST.get('file_type')
+        if request.POST.get('file_type') and request.FILES.get('file'):
 
-        # Update JAMB Admission Letter
-        if file_type == 'jamb_admission_letter':
-            jamb_letter_instance, created = JAMBAdmissionLetter.objects.get_or_create(user=user)
-            jamb_letter_instance.file = request.FILES.get('file')
-            jamb_letter_instance.save()
-            update_data['jamb_admission_letter'] = jamb_letter_instance
+            file_type = request.POST.get('file_type')
 
-        # Update School Admission Letter
-        if file_type == 'school_admission_letter':
-            school_letter_instance, created = SchoolAdmissionLetter.objects.get_or_create(user=user)
-            school_letter_instance.file = request.FILES.get('file')
-            school_letter_instance.save()
-            update_data['school_admission_letter'] = school_letter_instance
+            # Update JAMB Admission Letter
+            if file_type == 'jamb_admission_letter':
+                jamb_letter_instance, created = JAMBAdmissionLetter.objects.get_or_create(user=user)
+                jamb_letter_instance.file = request.FILES.get('file')
+                jamb_letter_instance.save()
+                update_data['jamb_admission_letter'] = jamb_letter_instance
 
-        # Update JAMB Result Slip
-        if file_type == 'jamb_result_slip':
-            jamb_slip_instance, created = JAMBResultSlip.objects.get_or_create(user=user)
-            jamb_slip_instance.file = request.FILES.get('file')
-            jamb_slip_instance.save()
-            update_data['jamb_result_slip'] = jamb_slip_instance
+            # Update School Admission Letter
+            if file_type == 'school_acceptance_form':
+                school_letter_instance, created = SchoolAcceptanceForm.objects.get_or_create(user=user)
+                school_letter_instance.file = request.FILES.get('file')
+                school_letter_instance.save()
+                update_data['school_acceptance_form'] = school_letter_instance
+
+            # Update JAMB Result Slip
+            if file_type == 'jamb_result_slip':
+                jamb_slip_instance, created = JAMBResultSlip.objects.get_or_create(user=user)
+                jamb_slip_instance.file = request.FILES.get('file')
+                jamb_slip_instance.save()
+                update_data['jamb_result_slip'] = jamb_slip_instance
+
+            # Update Birth Certificate
+            if file_type == 'birth_certificate':
+                birth_certificate_instance, created = BirthCertificate.objects.get_or_create(user=user)
+                birth_certificate_instance.file = request.FILES.get('file')
+                birth_certificate_instance.save()
+                update_data['birth_certificate'] = birth_certificate_instance
+
+            # Update Local Government Certification
+            if file_type == 'local_government_certification':
+                local_government_cert_instance, created = LocalGovernmentCertification.objects.get_or_create(user=user)
+                local_government_cert_instance.file = request.FILES.get('file')
+                local_government_cert_instance.save()
+                update_data['local_government_certification'] = local_government_cert_instance
+
+            # Update Student Bio Data
+            if file_type == 'bio_data':
+                bio_data, created = StudentBioData.objects.get_or_create(user=user)
+                bio_data.file = request.FILES.get('file')
+                bio_data.save()
+                update_data['bio_data'] = bio_data
+
+            # Update Medical Examination Form
+            if file_type == 'medical_examination_form':
+                medical_form_instance, created = MedicalExaminationForm.objects.get_or_create(user=user)
+                medical_form_instance.file = request.FILES.get('file')
+                medical_form_instance.save()
+                update_data['medical_examination_form'] = medical_form_instance
+
+        else:
+            messages.success(request, 'You need to upload a file')
+            return redirect('student_registration_update')
 
         # Update O'Level Result
-        if request.FILES.get('o_level_result'):
+        if request.FILES.get('o_level_result') and request.FILES.get('o_level_result'):
             o_level_type = request.FILES.get('o_level_type').strip()
-            if o_level_type:
-                o_level_instance, created = OLevelResult.objects.get_or_create(user=user)
-                o_level_instance.type = o_level_type
-                o_level_instance.file = request.FILES.get('o_level_result')
-                o_level_instance.save()
-                update_data['o_level_result'] = o_level_instance
-            else:
-                messages.success(request, 'O\'Level Result requires a type (WAEC or NECO).')
-                return redirect('student_registration_update')
-
-        # Update Medical Examination Form
-        if file_type == 'medical_examination_form':
-            medical_form_instance, created = MedicalExaminationForm.objects.get_or_create(user=user)
-            medical_form_instance.file = request.FILES.get('file')
-            medical_form_instance.save()
-            update_data['medical_examination_form'] = medical_form_instance
+            o_level_instance, created = OLevelResult.objects.get_or_create(user=user)
+            o_level_instance.type = o_level_type
+            o_level_instance.file = request.FILES.get('o_level_result')
+            o_level_instance.save()
+            update_data['o_level_result'] = o_level_instance
+        else:
+            messages.success(request, 'O\'Level Result requires a type (WAEC or NECO).')
+            return redirect('student_registration_update')
 
         # Update Parent Details
-        if request.POST.get('parent_relationship'):
+        if request.POST.get('parent_relationship') and request.FILES.get('parent_letter_of_undertaking'):
             parent_relationship = request.POST.get('parent_relationship').strip()
-            if parent_relationship:
-                parent_letter_instance, created = ParentLetterOfUndertaking.objects.get_or_create(user=user)
-                parent_letter_instance.relationship = parent_relationship
-                parent_letter_instance.file = request.FILES.get('parent_letter_of_undertaking')
-                parent_letter_instance.save()
-                update_data['letter_of_undertaking_parent'] = parent_letter_instance
-            else:
-                messages.success(request, 'Parent Letter of Undertaking requires a type.')
-                return redirect('student_registration_update')
+            parent_letter_instance, created = ParentLetterOfUndertaking.objects.get_or_create(user=user)
+            parent_letter_instance.relationship = parent_relationship
+            parent_letter_instance.file = request.FILES.get('parent_letter_of_undertaking')
+            parent_letter_instance.save()
+            update_data['letter_of_undertaking_parent'] = parent_letter_instance
+        else:
+            messages.success(request, 'Parent Letter of Undertaking requires a type.')
+            return redirect('student_registration_update')
 
         # Update Guarantor Details
-        if request.POST.get('guarantor_relationship'):
+        if request.POST.get('guarantor_relationship') and request.FILES.get('guarantor_letter_of_undertaking'):
             guarantor_relationship = request.POST.get('guarantor_relationship').strip()
-            if guarantor_relationship:
-                guarantor_letter_instance, created = GuarantorLetterOfUndertaking.objects.get_or_create(user=user)
-                guarantor_letter_instance.relationship = guarantor_relationship
-                guarantor_letter_instance.file = request.FILES.get('guarantor_letter_of_undertaking')
-                guarantor_letter_instance.save()
-                update_data['letter_of_undertaking_parent'] = guarantor_letter_instance
-            else:
-                messages.success(request, 'Guarantor Letter of Undertaking requires a type.')
-                return redirect('student_registration_update')
-
-        # Update Birth Certificate
-        if file_type == 'birth_certificate':
-            birth_certificate_instance, created = BirthCertificate.objects.get_or_create(user=user)
-            birth_certificate_instance.file = request.FILES.get('file')
-            birth_certificate_instance.save()
-            update_data['birth_certificate'] = birth_certificate_instance
-
-        # Update Local Government Certification
-        if file_type == 'local_government_certification':
-            local_government_cert_instance, created = LocalGovernmentCertification.objects.get_or_create(user=user)
-            local_government_cert_instance.file = request.FILES.get('file')
-            local_government_cert_instance.save()
-            update_data['local_government_certification'] = local_government_cert_instance
-
-        # Update Student Bio Data
-        if file_type == 'bio_data':
-            bio_data, created = StudentBioData.objects.get_or_create(user=user)
-            bio_data.file = request.FILES.get('file')
-            bio_data.save()
-            update_data['bio_data'] = bio_data
+            guarantor_letter_instance, created = GuarantorLetterOfUndertaking.objects.get_or_create(user=user)
+            guarantor_letter_instance.relationship = guarantor_relationship
+            guarantor_letter_instance.file = request.FILES.get('guarantor_letter_of_undertaking')
+            guarantor_letter_instance.save()
+            update_data['letter_of_undertaking_parent'] = guarantor_letter_instance
+        else:
+            messages.success(request, 'Guarantor Letter of Undertaking requires a type.')
+            return redirect('student_registration_update')
 
         # Update registration object with collected data
         if update_data:
@@ -338,7 +339,7 @@ def user_profile(request):
 
     context = {
         'user': user,
-        'registration_status': registration.status,
+        'registration_status': registration.registration_status,
         "payment_status": payment_made.status
     }
 

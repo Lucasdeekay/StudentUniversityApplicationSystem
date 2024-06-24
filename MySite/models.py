@@ -7,7 +7,7 @@ class JAMBAdmissionLetter(models.Model):
     file = models.FileField(upload_to='jamb_admission_letters/')
 
 
-class SchoolAdmissionLetter(models.Model):
+class SchoolAcceptanceForm(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     file = models.FileField(upload_to='school_admission_letters/')
 
@@ -62,7 +62,7 @@ class LocalGovernmentCertification(models.Model):
 
 class AcceptanceFeePayment(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    fee = models.DecimalField(max_digits=6, decimal_places=2, default=30000)
+    fee = models.IntegerField(default=30000)
     status = models.BooleanField(default=False)
 
 
@@ -73,9 +73,9 @@ class StudentBioData(models.Model):
 
 class StudentRegistration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    acceptance_fee = models.ForeignKey(AcceptanceFeePayment, on_delete=models.CASCADE)
-    jamb_admission_letter = models.ForeignKey(JAMBAdmissionLetter, on_delete=models.CASCADE)
-    school_admission_letter = models.ForeignKey(SchoolAdmissionLetter, on_delete=models.CASCADE, null=True, blank=True)
+    acceptance_fee = models.ForeignKey(AcceptanceFeePayment, on_delete=models.CASCADE, null=True, blank=True)
+    jamb_admission_letter = models.ForeignKey(JAMBAdmissionLetter, on_delete=models.CASCADE, null=True, blank=True)
+    school_acceptance_form = models.ForeignKey(SchoolAcceptanceForm, on_delete=models.CASCADE, null=True, blank=True)
     jamb_result_slip = models.ForeignKey(JAMBResultSlip, on_delete=models.CASCADE, null=True, blank=True)
     o_level_result = models.ForeignKey(OLevelResult, on_delete=models.CASCADE, null=True, blank=True)
     medical_examination_form = models.ForeignKey(MedicalExaminationForm, on_delete=models.CASCADE, null=True,
@@ -89,20 +89,21 @@ class StudentRegistration(models.Model):
                                                        null=True, blank=True)
     bio_data = models.ForeignKey(StudentBioData, on_delete=models.CASCADE, null=True, blank=True)
     registration_status = models.CharField(max_length=100, choices=[
-        ('PENDING_PAYMENT', 'Pending Payment'),
-        ('JAMB_ADMISSION_LETTER_RE_UPLOAD', 'Re-upload JAMB Admission Letter'),
-        ('SCHOOL_ADMISSION_LETTER_RE_UPLOAD', 'Re-upload School Admission Letter'),
-        ('JAMB_RESULT_SLIP_RE_UPLOAD', 'Re-upload JAMB Result Slip'),
-        ('O_LEVEL_RESULT_RE_UPLOAD', 'Re-upload O\'Level Result'),
-        ('MEDICAL_EXAMINATION_FORM_RE_UPLOAD', 'Re-upload Medical Examination Form'),
-        ('PARENT_LETTER_OF_UNDERTAKING_RE_UPLOAD', 'Re-upload Parent Letter Of Undertaking'),
-        ('GUARANTOR_LETTER_OF_UNDERTAKING_RE_UPLOAD', 'Re-upload Guarantor Letter Of Undertaking'),
-        ('BIRTH_CERTIFICATE_RE_UPLOAD', 'Re-upload Birth Certificate'),
-        ('LOCAL_GOVERNMENT_CERTIFICATE_RE_UPLOAD', 'Re-upload Local Government Certification'),
-        ('BIO_DATA_RE_UPLOAD', 'Re-upload Bio-data'),
-        ('ALL_DOCUMENTS_RE_UPLOAD', 'Re-upload All Documents'),
-        ('COMPLETED', 'Completed'),
-    ], default='PENDING_PAYMENT')
+        ('Pending Payment', 'Pending Payment'),
+        ('Upload All Documents', 'Upload All Documents'),
+        ('Re-upload JAMB Admission Letter', 'Re-upload JAMB Admission Letter'),
+        ('Re-upload School Acceptance Form', 'Re-upload School Acceptance Form'),
+        ('Re-upload JAMB Result Slip', 'Re-upload JAMB Result Slip'),
+        ('Re-upload O\'Level Result', 'Re-upload O\'Level Result'),
+        ('Re-upload Medical Examination Form', 'Re-upload Medical Examination Form'),
+        ('Re-upload Parent Letter Of Undertaking', 'Re-upload Parent Letter Of Undertaking'),
+        ('Re-upload Guarantor Letter Of Undertaking', 'Re-upload Guarantor Letter Of Undertaking'),
+        ('Re-upload Birth Certificate', 'Re-upload Birth Certificate'),
+        ('Re-upload Local Government Certification', 'Re-upload Local Government Certification'),
+        ('Re-upload Bio-data', 'Re-upload Bio-data'),
+        ('Re-upload All Documents', 'Re-upload All Documents'),
+        ('Completed', 'Completed'),
+    ], default='Pending Payment')
 
     def __str__(self):
         return f"{self.user.username} - {self.registration_status}"

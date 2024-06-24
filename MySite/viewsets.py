@@ -2,12 +2,12 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from .models import (
-    JAMBAdmissionLetter, SchoolAdmissionLetter, JAMBResultSlip, OLevelResult,
+    JAMBAdmissionLetter, SchoolAcceptanceForm, JAMBResultSlip, OLevelResult,
     MedicalExaminationForm, ParentLetterOfUndertaking, GuarantorLetterOfUndertaking,
     BirthCertificate, LocalGovernmentCertification, StudentBioData, StudentRegistration, AcceptanceFeePayment
 )
 from .serializers import (
-    JAMBAdmissionLetterSerializer, SchoolAdmissionLetterSerializer, JAMBResultSlipSerializer,
+    JAMBAdmissionLetterSerializer, SchoolAcceptanceFormSerializer, JAMBResultSlipSerializer,
     OLevelResultSerializer, MedicalExaminationFormSerializer, ParentLetterOfUndertakingSerializer,
     GuarantorLetterOfUndertakingSerializer, BirthCertificateSerializer,
     LocalGovernmentCertificationSerializer, StudentBioDataSerializer, StudentRegistrationSerializer,
@@ -21,9 +21,9 @@ class JAMBAdmissionLetterViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]  # Add authentication if needed
 
 
-class SchoolAdmissionLetterViewSet(viewsets.ModelViewSet):
-    queryset = SchoolAdmissionLetter.objects.all()
-    serializer_class = SchoolAdmissionLetterSerializer
+class SchoolAcceptanceFormViewSet(viewsets.ModelViewSet):
+    queryset = SchoolAcceptanceForm.objects.all()
+    serializer_class = SchoolAcceptanceFormSerializer
     permission_classes = [IsAuthenticated]  # Add authentication if needed
 
 
