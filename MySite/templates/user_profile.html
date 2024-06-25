@@ -52,6 +52,18 @@
                             Registration Status: <strong>{{ registration_status }}</strong>
                         </h4>
 
+                        {% if registration_status == 'Completed' %}
+                        <h2 class="mt-2 text-left border-top pt-2">
+                            Registration Completed
+                        </h2>
+                        <div class="card-text my-2 mx-1 text-left bold">
+                            <h3>Kindly proceed to download your <strong>ADMISSION LETTER</strong></h3>
+                        </div>
+                        <div class="text-center">
+                            <a href="{% static 'assets/documents/Admission_Letter_Dominion_University.pdf' %}" download
+                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i> Admission Letter</a>
+                        </div>
+                        {% else %}
                         <h2 class="mt-2 text-left border-top pt-2">
                             Registration Process
                         </h2>
@@ -68,13 +80,14 @@
                             </ul>
                         </div>
                         <a href="{% static 'assets/documents/Dominion_University_Student_bio-data_form.pdf' %}" download
-                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i> Student Bio-Data</a>
+                           class="btn btn-sm btn-dark white m-2"><i class="la la-file-pdf"></i> Student Bio-Data</a>
                         <a href="{% static 'assets/documents/Letter_of_Undertaking(Parent_Guardian_or_Sponsor).pdf' %}" download
-                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i> Parent Letter of Undertaking</a>
+                           class="btn btn-sm btn-dark white m-2"><i class="la la-file-pdf"></i> Parent Letter of Undertaking</a>
                         <a href="{% static 'assets/documents/LETTER_OF_UNDERTAKING_(CLERGY_CLERIC_OR_PUBLIC_SERVANT).pdf' %}" download
-                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i>Clergy Letter of Undertaking</a>
+                           class="btn btn-sm btn-dark white m-2"><i class="la la-file-pdf"></i>Clergy Letter of Undertaking</a>
                         <a href="{% static 'assets/documents/ACCEPTANCE_OF_OFFER_FORM_DOMINION_UNIVERSITY.pdf' %}" download
-                           class="btn btn-lg btn-dark white m-2"><i class="la la-file-pdf"></i>Acceptance of Offer Letter</a>
+                           class="btn btn-sm btn-dark white m-2"><i class="la la-file-pdf"></i>Acceptance of Offer Letter</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
