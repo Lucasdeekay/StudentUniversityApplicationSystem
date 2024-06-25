@@ -177,21 +177,70 @@ def student_registration(request):
         registration, created = StudentRegistration.objects.get_or_create(user=user)
         if created:
             registration.acceptance_fee = AcceptanceFeePayment.objects.get(user=user)
-        registration.jamb_admission_letter = JAMBAdmissionLetter.objects.create(user=user, file=jamb_letter)
-        registration.school_admission_letter = SchoolAcceptanceForm.objects.create(user=user, file=school_acceptance_form)
-        registration.jamb_result_slip = JAMBResultSlip.objects.create(user=user, file=jamb_slip)
-        registration.o_level_result = OLevelResult.objects.create(user=user, type=o_level_type, file=o_level_result)
-        registration.medical_examination_form = MedicalExaminationForm.objects.create(user=user, file=medical_form)
-        registration.letter_of_undertaking_parent = ParentLetterOfUndertaking.objects.create(user=user,
-                                                                                             relationship=parent_relationship,
-                                                                                             file=parent_letter)
-        registration.letter_of_undertaking_guarantor = GuarantorLetterOfUndertaking.objects.create(user=user,
-                                                                                                   relationship=guarantor_relationship,
-                                                                                                   file=guarantor_letter)
-        registration.birth_certificate = BirthCertificate.objects.create(user=user, file=birth_certificate)
-        registration.local_government_certification = LocalGovernmentCertification.objects.create(user=user,
-                                                                                                  file=local_government_cert)
-        registration.bio_data = StudentBioData.objects.create(user=user, file=bio_data)
+
+        jamb_admission_letter_instance, created = JAMBAdmissionLetter.objects.get_or_create(user=user)
+        if created:
+            jamb_admission_letter_instance.file = jamb_letter
+            jamb_admission_letter_instance.save()
+            registration.jamb_admission_letter = jamb_admission_letter_instance
+
+        school_admission_letter_instance, created = SchoolAcceptanceForm.objects.get_or_create(user=user)
+        if created:
+            school_admission_letter_instance.file = school_acceptance_form
+            school_admission_letter_instance.save()
+            registration.school_admission_letter = school_admission_letter_instance
+
+        jamb_result_slip_instance, created = JAMBResultSlip.objects.get_or_create(user=user)
+        if created:
+            jamb_result_slip_instance.file = jamb_slip
+            jamb_result_slip_instance.save()
+            registration.jamb_result_slip = jamb_result_slip_instance
+
+        o_level_result_instance, created = OLevelResult.objects.get_or_create(user=user)
+        if created:
+            o_level_result_instance.file = o_level_result
+            o_level_result_instance.type = o_level_type
+            o_level_result_instance.save()
+            registration.o_level_result = o_level_result_instance
+
+        medical_examination_form_instance, created = MedicalExaminationForm.objects.get_or_create(user=user)
+        if created:
+            medical_examination_form_instance.file = medical_form
+            medical_examination_form_instance.save()
+            registration.medical_examination_form = medical_examination_form_instance
+
+        letter_of_undertaking_parent_instance, created = ParentLetterOfUndertaking.objects.get_or_create(user=user)
+        if created:
+            letter_of_undertaking_parent_instance.file = parent_letter
+            letter_of_undertaking_parent_instance.relationship = parent_relationship
+            letter_of_undertaking_parent_instance.save()
+            registration.medical_examination_form = letter_of_undertaking_parent_instance
+
+        letter_of_undertaking_guarantor_instance, created = GuarantorLetterOfUndertaking.objects.get_or_create(user=user)
+        if created:
+            letter_of_undertaking_guarantor_instance.file = guarantor_letter
+            letter_of_undertaking_guarantor_instance.relationship = guarantor_relationship
+            letter_of_undertaking_guarantor_instance.save()
+            registration.letter_of_undertaking_guarantor = letter_of_undertaking_guarantor_instance
+
+        birth_certificate_instance, created = BirthCertificate.objects.get_or_create(user=user)
+        if created:
+            birth_certificate_instance.file = birth_certificate
+            birth_certificate_instance.save()
+            registration.birth_certificate = birth_certificate_instance
+
+        local_government_certification_instance, created = LocalGovernmentCertification.objects.get_or_create(user=user)
+        if created:
+            local_government_certification_instance.file = local_government_cert
+            local_government_certification_instance.save()
+            registration.local_government_certification = local_government_certification_instance
+
+        bio_data_instance, created = StudentBioData.objects.get_or_create(user=user)
+        if created:
+            bio_data_instance.file = bio_data
+            bio_data_instance.save()
+            registration.bio_data = bio_data_instance
+
         registration.save()
 
         messages.success(request, 'Registration successful!')
